@@ -20,6 +20,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * 회원의 엔티티 클래스 입니다.
+ *
+ * @author : 송학현
+ * @since : 1.0
+ */
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

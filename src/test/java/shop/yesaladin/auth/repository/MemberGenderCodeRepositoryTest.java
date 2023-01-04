@@ -9,6 +9,12 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import shop.yesaladin.auth.entity.MemberGenderCode;
 
+/**
+ * Some description here
+ *
+ * @author : 송학현
+ * @since : 1.0
+ */
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 class MemberGenderCodeRepositoryTest {
