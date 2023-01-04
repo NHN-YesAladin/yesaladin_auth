@@ -7,9 +7,13 @@ spring:
     url: jdbc:mysql://133.186.151.141:3306/yesaladin_shop_dev?serverTimezone=Asia/Seoul
     username: yesaladin
     password: PR7QyDl]Ojwaw7Y@
-    dbcp2:
-      test-on-borrow: true
-      validation-query: SELECT 1
+    hikari:
+      connection-timeout: 3000
+      validation-timeout: 3000
+      minimum-idle: 5
+      max-lifetime: 240000
+      maximum-pool-size: 20
+      connection-test-query: SELECT 1
 
   jpa:
     hibernate:
