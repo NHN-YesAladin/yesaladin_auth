@@ -22,37 +22,54 @@ class MemberRepositoryTest {
     MemberRepository memberRepository;
 
     @Test
-    void test() throws Exception {
+    void entityMappingTest() throws Exception {
         //given
+        int id = 1;
+        String gradeName = "플래티넘";
+        long baseGivenPoint = 2000L;
+        long baseOrderAmount = 200000L;
+
         MemberGrade grade = MemberGrade.builder()
-                .id(1)
-                .name("플래티넘")
-                .baseGivenPoint(2000L)
-                .baseOrderAmount(200000L)
+                .id(id)
+                .name(gradeName)
+                .baseGivenPoint(baseGivenPoint)
+                .baseOrderAmount(baseOrderAmount)
                 .build();
+
+        String gender = "MALE";
 
         MemberGenderCode male = MemberGenderCode.builder()
-                .id(1)
-                .gender("MALE")
+                .id(id)
+                .gender(gender)
                 .build();
+
+        String roleMember = "ROLE_MEMBER";
 
         Role role = Role.builder()
-                .id(1)
-                .name("ROLE_MEMBER")
+                .id(id)
+                .name(roleMember)
                 .build();
 
+        String ramos = "Ramos";
+        String password = "password";
+        String email = "test@test.com";
+        int birthDay = 19;
+        int birthMonth = 1;
+        int birthYear = 1996;
+        long point = 0L;
+
         Member member = Member.builder()
-                .nickname("Ramos")
-                .name("Ramos")
-                .loginId("test")
-                .password("password")
-                .birthYear(1996)
-                .birthMonth(1)
-                .birthDay(19)
-                .email("test@test.com")
+                .nickname(ramos)
+                .name(ramos)
+                .loginId(ramos)
+                .password(password)
+                .birthYear(birthYear)
+                .birthMonth(birthMonth)
+                .birthDay(birthDay)
+                .email(email)
                 .signUpDate(LocalDateTime.now())
                 .isBlocked(false)
-                .point(0L)
+                .point(point)
                 .memberGrade(grade)
                 .memberGenderCode(male)
                 .roles(List.of(role))
@@ -62,8 +79,10 @@ class MemberRepositoryTest {
         Member savedMember = memberRepository.save(member);
 
         //then
+        int index = 0;
+
         assertThat(savedMember).isNotNull();
-        assertThat(savedMember.getMemberGrade().getName()).isEqualTo("플래티넘");
-        assertThat(savedMember.getRoles().get(0).getName()).isEqualTo("ROLE_MEMBER");
+        assertThat(savedMember.getMemberGrade().getName()).isEqualTo(gradeName);
+        assertThat(savedMember.getRoles().get(index).getName()).isEqualTo(roleMember);
     }
 }
