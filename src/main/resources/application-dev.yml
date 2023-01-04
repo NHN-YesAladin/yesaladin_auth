@@ -1,0 +1,21 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://133.186.151.141:3306/yesaladin_shop_dev?serverTimezone=Asia/Seoul
+    username: yesaladin
+    password: PR7QyDl]Ojwaw7Y@
+    dbcp2:
+      test-on-borrow: true
+      validation-query: SELECT 1
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
