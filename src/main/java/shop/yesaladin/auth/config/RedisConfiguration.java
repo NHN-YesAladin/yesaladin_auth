@@ -30,7 +30,7 @@ public class RedisConfiguration implements BeanClassLoaderAware {
     @Value("${spring.redis.host:null}")
     private String host;
 
-    @Value("${spring.redis.port:0}")
+    @Value("${spring.redis.port:6379}")
     private int port;
 
     @Value("${spring.redis.password:null}")
