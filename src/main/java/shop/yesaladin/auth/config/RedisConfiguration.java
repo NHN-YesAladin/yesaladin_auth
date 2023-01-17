@@ -63,6 +63,8 @@ public class RedisConfiguration implements BeanClassLoaderAware {
      * Redis에 key, value 등과 관련된 연산을 하기 위해 설정합니다.
      *
      * @return Redis에 get, put 등을 하기 위한 RedisTemplate
+     * @author : 송학현
+     * @since : 1.0
      */
     @Bean
     public RedisTemplate<String, Object> redisTemplate() {
