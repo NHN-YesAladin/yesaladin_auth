@@ -29,7 +29,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
 
         ResponseEntity<MemberResponse> response = restTemplate.getForEntity(
-                shopUrl + "/api/members/{loginId}",
+                shopUrl + "/v1/members/login/{loginId}",
                 MemberResponse.class,
                 loginId
         );

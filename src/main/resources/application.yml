@@ -1,6 +1,6 @@
 yesaladin:
   shop: http://api.yesaladin.shop:8072/shop
-  gateway: https://yesaladin.shop
+  front: https://yesaladin.shop
 
 jwt:
   secret: 8a58f203537f19fa1a147c3ef7f3aa4655b1fdf6a9d733c8f3c5154f5c5687c6757c89f72620c71d22a19299d913b434f95f0414203517ad6a4e5b824ebc22bf

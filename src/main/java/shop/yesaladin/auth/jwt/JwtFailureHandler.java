@@ -12,8 +12,8 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 @Slf4j
 public class JwtFailureHandler implements AuthenticationFailureHandler {
 
-    @Value("${gatewayUrl}")
-    private String gatewayUrl;
+    @Value("${front}")
+    private String frontUrl;
 
     @Override
     public void onAuthenticationFailure(
@@ -22,7 +22,7 @@ public class JwtFailureHandler implements AuthenticationFailureHandler {
             AuthenticationException exception
     ) throws IOException, ServletException {
         log.info("Failure Handler called");
-        // TODO: /members/login으로 변경 예정
-        response.sendRedirect(gatewayUrl + "/web/members/login");
+        // TODO: url 정보 수정
+        response.sendRedirect(frontUrl + "/members/login");
     }
 }
