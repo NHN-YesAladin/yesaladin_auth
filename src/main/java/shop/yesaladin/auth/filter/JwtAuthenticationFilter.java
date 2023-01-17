@@ -18,6 +18,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import shop.yesaladin.auth.dto.LoginRequest;
 import shop.yesaladin.auth.jwt.JwtTokenProvider;
 
+/**
+ * JWT 토큰 인증을 위해 UsernamePasswordAuthenticationFilter를 대체하여 custom한 filter 입니다.
+ *
+ * @author : 송학현
+ * @since : 1.0
+ */
 @Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -29,6 +35,19 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate<String, Object> redisTemplate;
 
+    /**
+     * Front Server에서 login을 시도하면 발생하는 기능 입니다.
+     * 사용자가 입력한 loginId와 password를 기반으로 UsernamePasswordAuthenticationToken을 발급하고
+     * authenticationManager에게 인가를 위임합니다.
+     *
+     * @param request HttpServletRequest
+     * @param response HttpServletResponse
+     * @return authenticationManager에게 인가를 위임하여 반환된 결과입니다.
+     * @throws AuthenticationException Spring Security에서 발생하는 예외 입니다.
+     *
+     * @author : 송학현
+     * @since : 1.0
+     */
     @SneakyThrows
     @Override
     public Authentication attemptAuthentication(
@@ -57,6 +76,20 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         return authenticationManager.authenticate(authenticationToken);
     }
 
+    /**
+     * 인증 성공 시 동작하는 후처리 메소드 입니다.
+     * JWT 토큰을 발급하고 Redis에 저장 및 HTTP Header Authorization 필드에 accessToken을 담아 반환합니다.
+     *
+     * @param request HttpServletRequest
+     * @param response HttpServletResponse
+     * @param chain FilterChain
+     * @param auth 인증 객체 입니다.
+     * @throws IOException
+     * @throws ServletException
+     *
+     * @author : 송학현
+     * @since : 1.0
+     */
     @Override
     protected void successfulAuthentication(
             HttpServletRequest request,
