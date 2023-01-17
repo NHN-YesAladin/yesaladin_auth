@@ -26,7 +26,7 @@ import shop.yesaladin.auth.dto.MemberResponse;
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    @Value("${yesaladin.shop}")
+    @Value("${yesaladin.shop:null}")
     private String shopUrl;
 
     private final RestTemplate restTemplate;
