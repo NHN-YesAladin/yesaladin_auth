@@ -27,16 +27,16 @@ import org.springframework.session.web.http.DefaultCookieSerializer;
 @Configuration
 public class RedisConfiguration implements BeanClassLoaderAware {
 
-    @Value("${spring.redis.host}")
+    @Value("${spring.redis.host:null}")
     private String host;
 
-    @Value("${spring.redis.port}")
+    @Value("${spring.redis.port:null}")
     private int port;
 
-    @Value("${spring.redis.password}")
+    @Value("${spring.redis.password:null}")
     private String password;
 
-    @Value("${spring.redis.database}")
+    @Value("${spring.redis.database:null}")
     private int database;
 
     private ClassLoader classLoader;
