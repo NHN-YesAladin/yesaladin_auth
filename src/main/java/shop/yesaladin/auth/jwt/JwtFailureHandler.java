@@ -18,7 +18,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 @Slf4j
 public class JwtFailureHandler implements AuthenticationFailureHandler {
 
-    @Value("${yesaladin.front:null}")
+    @Value("${yesaladin.front}")
     private String frontUrl;
 
     /**
