@@ -35,7 +35,8 @@ public class SecurityConfiguration {
      *
      * @param http http의 filter 등록을 위한 객체 입니다.
      * @return Bean으로 등록한 SecurityFilterChain 입니다.
-     * @throws Exception
+     * @throws Exception Spring Security의 메소드에서 발생하는 예외 입니다.
+     *
      * @author : 송학현
      * @since : 1.0
      */
@@ -61,6 +62,7 @@ public class SecurityConfiguration {
      * PasswordEncoder를 빈으로 등록하기 위한 메소드 입니다.
      *
      * @return 회원가입 시 password를 encoding 하기 위해 등록한 Bean 입니다.
+     *
      * @author : 송학현
      * @since : 1.0
      */
@@ -73,7 +75,8 @@ public class SecurityConfiguration {
      * Jwt 인증을 위해 UsernamePasswordAuthenticaitonFilter를 custom한 Filter의 설정을 위한 기능입니다.
      *
      * @return UsernamePasswordAuthenticationFilter를 custom한 Filter를 반환합니다.
-     * @throws Exception
+     * @throws Exception Spring Security에서 발생하는 예외입니다.
+     *
      * @author : 송학현
      * @since : 1.0
      */
@@ -90,6 +93,16 @@ public class SecurityConfiguration {
         return jwtAuthenticationFilter;
     }
 
+    /**
+     * 인증을 관리하는 AuthenticationManager 를 반환합니다.
+     *
+     * @param configuration 인증 구성
+     * @return 인증 정보를 관리하는 AuthenticationManager를 반환합니다.
+     * @throws Exception getAuthenticationManager()에서 발생하는 예외
+     *
+     * @author : 송학현
+     * @since : 1.0
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
             throws Exception {
@@ -100,6 +113,7 @@ public class SecurityConfiguration {
      * 인증 실패시 동작하는 핸들러를 Bean으로 등록합니다.
      *
      * @return 인증 실패에 대한 Handler 입니다.
+     *
      * @author : 송학현
      * @since : 1.0
      */
