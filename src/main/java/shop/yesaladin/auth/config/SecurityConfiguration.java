@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import shop.yesaladin.auth.filter.JwtAuthenticationFilter;
 import shop.yesaladin.auth.jwt.JwtFailureHandler;
 import shop.yesaladin.auth.jwt.JwtTokenProvider;
@@ -41,7 +42,10 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeRequests().anyRequest().permitAll();
-        http.formLogin().disable();
+        http.formLogin()
+                .loginProcessingUrl("/auth/login")
+                .failureHandler(authenticationFailureHandler());
+        http.addFilterAt(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         http.logout().disable();
         http.csrf().disable();
 
@@ -65,6 +69,14 @@ public class SecurityConfiguration {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Jwt 인증을 위해 UsernamePasswordAuthenticaitonFilter를 custom한 Filter의 설정을 위한 기능입니다.
+     *
+     * @return UsernamePasswordAuthenticationFilter를 custom한 Filter를 반환합니다.
+     * @throws Exception
+     * @author : 송학현
+     * @since : 1.0
+     */
     private JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
         JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(
                 authenticationManager(null),
@@ -84,6 +96,13 @@ public class SecurityConfiguration {
         return configuration.getAuthenticationManager();
     }
 
+    /**
+     * 인증 실패시 동작하는 핸들러를 Bean으로 등록합니다.
+     *
+     * @return 인증 실패에 대한 Handler 입니다.
+     * @author : 송학현
+     * @since : 1.0
+     */
     @Bean
     public AuthenticationFailureHandler authenticationFailureHandler() {
         return new JwtFailureHandler();

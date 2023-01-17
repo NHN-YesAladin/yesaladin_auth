@@ -22,6 +22,7 @@ public class JwtFailureHandler implements AuthenticationFailureHandler {
             AuthenticationException exception
     ) throws IOException, ServletException {
         log.info("Failure Handler called");
-        response.sendRedirect(gatewayUrl + "/front/login");
+        // TODO: /members/login으로 변경 예정
+        response.sendRedirect(gatewayUrl + "/web/members/login");
     }
 }

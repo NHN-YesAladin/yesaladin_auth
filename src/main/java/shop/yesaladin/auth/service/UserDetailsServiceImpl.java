@@ -1,7 +1,7 @@
 package shop.yesaladin.auth.service;
 
-import java.util.Collections;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,8 +20,8 @@ import shop.yesaladin.auth.dto.MemberResponse;
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    @Value("${gatewayUrl}")
-    private String gatewayUrl;
+    @Value("${yesaladin.shop}")
+    private String shopUrl;
 
     private final RestTemplate restTemplate;
 
@@ -29,7 +29,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
 
         ResponseEntity<MemberResponse> response = restTemplate.getForEntity(
-                gatewayUrl + "/api/members/{loginId}",
+                shopUrl + "/api/members/{loginId}",
                 MemberResponse.class,
                 loginId
         );
@@ -45,7 +45,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User user = new User(
                 member.getLoginId(),
                 member.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority(member.getRole()))
+                member.getRoles().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList())
         );
 
         log.info("user={}", user);

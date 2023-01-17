@@ -1,5 +1,6 @@
 package shop.yesaladin.auth.dto;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,5 @@ public class MemberResponse {
     private String loginId;
     private String email;
     private String password;
-    // TODO: Shop 서버의 API 구현 추가와 함께 List 타입으로 바꿔야 함.
-    private String role;
+    private List<String> roles;
 }
