@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: yesaladin-auth
+  config:
+    import: optional:configserver:localhost:8888
