@@ -37,7 +37,7 @@ public class JwtTokenProvider {
 
     private final UserDetailsService userDetailsService;
 
-    @Value("${jwt.secret:null}")
+    @Value("${jwt.secret}")
     private String secretKey;
 
     /**
