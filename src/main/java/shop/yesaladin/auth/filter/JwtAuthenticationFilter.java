@@ -2,6 +2,7 @@ package shop.yesaladin.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.util.UUID;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import shop.yesaladin.auth.dto.LoginRequest;
+import shop.yesaladin.auth.exception.InvalidLoginRequestException;
 import shop.yesaladin.auth.jwt.JwtTokenProvider;
 
 /**
@@ -54,12 +56,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             HttpServletRequest request, HttpServletResponse response
     ) throws AuthenticationException {
         ObjectMapper mapper = new ObjectMapper();
-        LoginRequest loginRequest = mapper.readValue(request.getInputStream(), LoginRequest.class);
+        LoginRequest loginRequest;
+        try {
+            loginRequest = mapper.readValue(request.getInputStream(), LoginRequest.class);
+            log.info("loginId={}", loginRequest.getLoginId());
+            log.info("password={}", loginRequest.getPassword());
+        } catch (IOException e) {
+            throw new InvalidLoginRequestException();
+        }
 
-        log.info("loginId={}", loginRequest.getLoginId());
-        log.info("password={}", loginRequest.getPassword());
-
-        // username과 password를 이용해 Authentication 타입의 토큰 생성
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 loginRequest.getLoginId(),
                 loginRequest.getPassword()
@@ -99,24 +104,49 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     ) throws IOException, ServletException {
         log.info("auth={}", auth);
         log.info("Granted Authorities={}", auth.getAuthorities());
-        String token = jwtTokenProvider.createAccessToken(
-                auth.getName(),
-                auth
-        );
-        // refresh token 발급 후 redis에 집어 넣기
-        String refreshToken = jwtTokenProvider.createRefreshToken(
-                auth.getName(),
-                auth
-        );
+        String accessToken = getAccessToken(auth);
+        String refreshToken = getRefreshToken(auth);
 
-//        String memberUuid = UUID.randomUUID().toString();
+        String memberUuid = UUID.randomUUID().toString();
 
         redisTemplate.opsForHash().put(auth.getName(), "REFRESH_TOKEN", refreshToken);
-//        redisTemplate.opsForHash().put(memberUuid, auth.getName(), auth.getName());
+        redisTemplate.opsForHash().put(memberUuid, "ACCESS_TOKEN", auth.getName());
 
-        response.addHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + token);
-
-        log.info("accessToken={}", token);
+        log.info("accessToken={}", accessToken);
         log.info("refreshToken={}", refreshToken);
+
+        response.addHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + accessToken);
+    }
+
+    /**
+     * 인증 객체를 JwtTokenProvider에게 전달하여 AccessToken을 발급합니다.
+     *
+     * @param auth 인증 객체 입니다.
+     * @return JWT 형식의 AccessToken 입니다.
+     *
+     * @author : 송학현
+     * @since : 1.0
+     */
+    private String getAccessToken(Authentication auth) {
+        return jwtTokenProvider.createAccessToken(
+                auth.getName(),
+                auth
+        );
+    }
+
+    /**
+     * 인증 객체를 JwtTokenProvider에게 전달하여 RefreshToken을 발급합니다.
+     *
+     * @param auth 인증 객체 입니다.
+     * @return JWT 형식의 RefreshToken 입니다.
+     *
+     * @author : 송학현
+     * @since : 1.0
+     */
+    private String getRefreshToken(Authentication auth) {
+        return jwtTokenProvider.createRefreshToken(
+                auth.getName(),
+                auth
+        );
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.security.jackson2.SecurityJackson2Modules;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 /**
  * Redis 설정 클래스 입니다.
@@ -20,6 +21,7 @@ import org.springframework.security.jackson2.SecurityJackson2Modules;
  * @author : 송학현
  * @since : 1.0
  */
+@EnableRedisHttpSession
 @Configuration
 public class RedisConfiguration implements BeanClassLoaderAware {
 
