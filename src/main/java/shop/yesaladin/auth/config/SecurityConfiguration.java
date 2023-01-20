@@ -51,8 +51,6 @@ public class SecurityConfiguration {
         http.csrf().disable();
 
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-        http.addFilter(jwtAuthenticationFilter());
         http.headers().frameOptions().sameOrigin();
 
         return http.build();
