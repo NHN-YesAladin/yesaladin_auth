@@ -34,6 +34,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private static final String BEARER_PREFIX = "Bearer ";
     private static final String REFRESH_TOKEN = "REFRESH_TOKEN";
     private static final String ACCESS_TOKEN = "ACCESS_TOKEN";
+    private static final String UUID_HEADER = "UUID_HEADER";
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
@@ -115,6 +116,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         log.info("refreshToken={}", refreshToken);
 
         response.addHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + accessToken);
+        response.addHeader(UUID_HEADER, memberUuid);
     }
 
     /**
@@ -145,5 +147,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 auth.getName(),
                 auth
         );
+    }
+
+    @Override
+    protected void unsuccessfulAuthentication(
+            HttpServletRequest request, HttpServletResponse response, AuthenticationException failed
+    ) throws IOException, ServletException {
+        log.error("login failed={}", failed.toString());
+        getFailureHandler().onAuthenticationFailure(request, response, failed);
     }
 }
