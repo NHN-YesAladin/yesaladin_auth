@@ -40,7 +40,6 @@ public class JwtFailureHandler implements AuthenticationFailureHandler {
             AuthenticationException exception
     ) throws IOException, ServletException {
         log.info("Failure Handler called");
-        // TODO: url 정보 수정
         response.sendRedirect(frontUrl + "/members/login");
     }
 }
