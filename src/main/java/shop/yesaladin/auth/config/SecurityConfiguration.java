@@ -12,7 +12,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import shop.yesaladin.auth.filter.JwtAuthenticationFilter;
 import shop.yesaladin.auth.jwt.JwtFailureHandler;
 import shop.yesaladin.auth.jwt.JwtTokenProvider;
@@ -43,12 +42,12 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeRequests().anyRequest().permitAll();
-        http.formLogin()
-                .loginProcessingUrl("/auth/login")
-                .failureHandler(authenticationFailureHandler());
-        http.addFilterAt(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.formLogin().disable();
+//                .loginProcessingUrl("/auth/login")
+//                .failureHandler(authenticationFailureHandler());
         http.logout().disable();
         http.csrf().disable();
+        http.addFilter(jwtAuthenticationFilter());
 
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.headers().frameOptions().sameOrigin();
