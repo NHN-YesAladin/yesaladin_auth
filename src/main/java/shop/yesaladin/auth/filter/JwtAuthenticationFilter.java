@@ -110,7 +110,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String memberUuid = UUID.randomUUID().toString();
 
         redisTemplate.opsForHash().put(auth.getName(), REFRESH_TOKEN, refreshToken);
-        redisTemplate.opsForHash().put(memberUuid, ACCESS_TOKEN, auth.getName());
 
         log.info("accessToken={}", accessToken);
         log.info("refreshToken={}", refreshToken);
