@@ -43,8 +43,6 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeRequests().anyRequest().permitAll();
         http.formLogin().disable();
-//                .loginProcessingUrl("/auth/login")
-//                .failureHandler(authenticationFailureHandler());
         http.logout().disable();
         http.csrf().disable();
         http.addFilter(jwtAuthenticationFilter());
