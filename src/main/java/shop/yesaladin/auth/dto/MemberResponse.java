@@ -10,8 +10,8 @@ import lombok.ToString;
 /**
  * Shop 서버에 회원 정보를 요청 시 결과를 받아오기 위한 DTO 입니다.
  *
- * @author : 송학현
- * @since : 1.0
+ * @author 송학현
+ * @since 1.0
  */
 @Getter
 @Setter

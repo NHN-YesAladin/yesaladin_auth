@@ -18,8 +18,8 @@ import shop.yesaladin.auth.dto.MemberResponse;
 /**
  * 인증 관련 비즈니스 로직을 수행하기 위해 UserDetailsService를 구현한 클래스 입니다.
  *
- * @author : 송학현
- * @since : 1.0
+ * @author 송학현
+ * @since 1.0
  */
 @Slf4j
 @Service
@@ -38,8 +38,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      * @return 찾은 사용자를 기반으로 생성된 UserDetails
      * @throws UsernameNotFoundException 해당 loginId와 일치하는 사용자가 존재하지 않는 경우 발생하는 예외
      *
-     * @author : 송학현
-     * @since : 1.0
+     * @author 송학현
+     * @since 1.0
      */
     @Override
     public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {

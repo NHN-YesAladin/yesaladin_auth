@@ -23,9 +23,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * JWT Token을 생성하기 위한 Provider 입니다.
- *
- * @author : 송학현
- * @since : 1.0
+ * @author 송학현
+ * @since 1.0
  */
 @Slf4j
 @Component
@@ -45,9 +44,8 @@ public class JwtTokenProvider {
      *
      * @param secretKey JWT를 생성하기 위해 사용하는 secretKey 입니다.
      * @return 인코딩 된 secretKey를 기반으로 HMAC-SHA 알고리즘으로 생성한 Key를 반환합니다.
-     *
-     * @author : 송학현
-     * @since : 1.0
+     * @author 송학현
+     * @since 1.0
      */
     private Key getSecretKey(String secretKey) {
         byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
@@ -61,9 +59,8 @@ public class JwtTokenProvider {
      * @param roles 회원의 권한 목록입니다.
      * @param tokenExpireTime 토큰의 유효 시간입니다.
      * @return 발급한 JWT 토큰을 반환합니다.
-     *
-     * @author : 송학현
-     * @since : 1.0
+     * @author 송학현
+     * @since 1.0
      */
     public String createToken(String loginId, Authentication roles, long tokenExpireTime) {
 
@@ -89,9 +86,8 @@ public class JwtTokenProvider {
      * @param loginId 회원의 loginId 입니다.
      * @param auth 회원의 정보를 담고 있는 인증 객체 입니다.
      * @return JWT 토큰으로 발급한 accessToken을 반환합니다.
-     *
-     * @author : 송학현
-     * @since : 1.0
+     * @author 송학현
+     * @since 1.0
      */
     public String createAccessToken(
             String loginId,
@@ -106,9 +102,8 @@ public class JwtTokenProvider {
      * @param loginId 회원의 loginId 입니다.
      * @param auth 회원의 정보를 담고 있는 인증 객체 입니다.
      * @return JWT 토큰으로 발급한 refreshToken 반환합니다.
-     *
-     * @author : 송학현
-     * @since : 1.0
+     * @author 송학현
+     * @since 1.0
      */
     public String createRefreshToken(
             String loginId,
@@ -122,9 +117,8 @@ public class JwtTokenProvider {
      *
      * @param token JWT 토큰입니다.
      * @return payload에 들어있는 회원의 loginId
-     *
-     * @author : 송학현
-     * @since : 1.0
+     * @author 송학현
+     * @since 1.0
      */
     public String extractLoginId(String token) {
         return Jwts.parserBuilder()
@@ -139,10 +133,9 @@ public class JwtTokenProvider {
      * secretKey를 기반 으로 JWT 토큰이 유효한 지 검증 하는 기능 입니다.
      *
      * @param token JWT 토큰입니다.
-     * @return 토큰이 유효한 토큰인지 판별한 결과
-     *
-     * @author : 송학현
-     * @since : 1.0
+     * @return 토큰이 유효한 토큰 인지 판별한 결과
+     * @author 송학현
+     * @since 1.0
      */
     public boolean isValidToken(String token) {
         try {
@@ -162,9 +155,8 @@ public class JwtTokenProvider {
      *
      * @param token JWT 토큰입니다.
      * @return token을 기반으로 조회한 사용자의 인증 객체를 반환합니다.
-     *
-     * @author : 송학현
-     * @since : 1.0
+     * @author 송학현
+     * @since 1.0
      */
     public Authentication getAuthentication(String token) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(extractLoginId(token));

@@ -19,8 +19,8 @@ import shop.yesaladin.auth.jwt.JwtTokenProvider;
 /**
  * Spring Security의 설정 Bean 등록 클래스입니다.
  *
- * @author : 송학현
- * @since : 1.0
+ * @author 송학현
+ * @since 1.0
  */
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -36,8 +36,8 @@ public class SecurityConfiguration {
      * @return Bean으로 등록한 SecurityFilterChain 입니다.
      * @throws Exception Spring Security의 메소드에서 발생하는 예외 입니다.
      *
-     * @author : 송학현
-     * @since : 1.0
+     * @author 송학현
+     * @since 1.0
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -58,8 +58,8 @@ public class SecurityConfiguration {
      *
      * @return 회원가입 시 password를 encoding 하기 위해 등록한 Bean 입니다.
      *
-     * @author : 송학현
-     * @since : 1.0
+     * @author 송학현
+     * @since 1.0
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -72,8 +72,8 @@ public class SecurityConfiguration {
      * @return UsernamePasswordAuthenticationFilter를 custom한 Filter를 반환합니다.
      * @throws Exception Spring Security에서 발생하는 예외입니다.
      *
-     * @author : 송학현
-     * @since : 1.0
+     * @author 송학현
+     * @since 1.0
      */
     private JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
         JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(
@@ -95,8 +95,8 @@ public class SecurityConfiguration {
      * @return 인증 정보를 관리하는 AuthenticationManager를 반환합니다.
      * @throws Exception getAuthenticationManager()에서 발생하는 예외
      *
-     * @author : 송학현
-     * @since : 1.0
+     * @author 송학현
+     * @since 1.0
      */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
@@ -109,8 +109,8 @@ public class SecurityConfiguration {
      *
      * @return 인증 실패에 대한 Handler 입니다.
      *
-     * @author : 송학현
-     * @since : 1.0
+     * @author 송학현
+     * @since 1.0
      */
     @Bean
     public AuthenticationFailureHandler authenticationFailureHandler() {

@@ -23,8 +23,8 @@ import shop.yesaladin.auth.jwt.JwtTokenProvider;
 /**
  * JWT 토큰 인증을 위해 UsernamePasswordAuthenticationFilter를 대체하여 custom한 filter 입니다.
  *
- * @author : 송학현
- * @since : 1.0
+ * @author 송학현
+ * @since 1.0
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -48,8 +48,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
      * @param response HttpServletResponse
      * @return authenticationManager에게 인가를 위임하여 반환된 결과입니다.
      * @throws AuthenticationException Spring Security에서 발생하는 예외 입니다.
-     * @author : 송학현
-     * @since : 1.0
+     * @author 송학현
+     * @since 1.0
      */
     @SneakyThrows
     @Override
@@ -83,17 +83,17 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     }
 
     /**
-     * 인증 성공 시 동작하는 후처리 메소드 입니다. JWT 토큰을 발급하고 Redis에 저장 및 HTTP Header Authorization 필드에 accessToken을
-     * 담아 반환합니다.
+     * 인증 성공 시 동작 하는 후처리 메소드 입니다.
+     * JWT 토큰을 발급 하고 Redis에 저장 및 HTTP Header Authorization 필드에 accessToken을 담아 반환 합니다.
      *
      * @param request  HttpServletRequest
      * @param response HttpServletResponse
      * @param chain    FilterChain
      * @param auth     인증 객체 입니다.
-     * @throws IOException
-     * @throws ServletException
-     * @author : 송학현
-     * @since : 1.0
+     * @throws IOException IO 관련 예외
+     * @throws ServletException Servlet 에서 발생 하는 예외
+     * @author 송학현
+     * @since 1.0
      */
     @Override
     protected void successfulAuthentication(
@@ -123,8 +123,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
      *
      * @param auth 인증 객체 입니다.
      * @return JWT 형식의 AccessToken 입니다.
-     * @author : 송학현
-     * @since : 1.0
+     * @author 송학현
+     * @since 1.0
      */
     private String getAccessToken(Authentication auth) {
         return jwtTokenProvider.createAccessToken(
@@ -138,8 +138,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
      *
      * @param auth 인증 객체 입니다.
      * @return JWT 형식의 RefreshToken 입니다.
-     * @author : 송학현
-     * @since : 1.0
+     * @author 송학현
+     * @since 1.0
      */
     private String getRefreshToken(Authentication auth) {
         return jwtTokenProvider.createRefreshToken(
@@ -148,6 +148,17 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         );
     }
 
+    /**
+     * 인증 실패 시 동작 하는 후처리 메소드 입니다.
+     *
+     * @param request HttpServletRequest
+     * @param response HttpServletResponse
+     * @param failed Spring Security의 인증 실패 예외
+     * @throws IOException IO 관련 예외
+     * @throws ServletException Servlet 관련 예외
+     * @author 송학현
+     * @since 1.0
+     */
     @Override
     protected void unsuccessfulAuthentication(
             HttpServletRequest request, HttpServletResponse response, AuthenticationException failed

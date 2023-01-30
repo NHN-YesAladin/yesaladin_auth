@@ -12,8 +12,8 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 /**
  * JWT 인증 로직을 수행할 때 로그인에 실패 하는 경우 발생 하는 handler 입니다.
  *
- * @author : 송학현
- * @since : 1.0
+ * @author 송학현
+ * @since 1.0
  */
 @Slf4j
 public class JwtFailureHandler implements AuthenticationFailureHandler {
@@ -30,8 +30,8 @@ public class JwtFailureHandler implements AuthenticationFailureHandler {
      * @throws IOException
      * @throws ServletException
      *
-     * @author : 송학현
-     * @since : 1.0
+     * @author 송학현
+     * @since 1.0
      */
     @Override
     public void onAuthenticationFailure(
