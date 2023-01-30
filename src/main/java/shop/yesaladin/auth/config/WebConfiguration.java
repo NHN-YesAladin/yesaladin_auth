@@ -9,8 +9,8 @@ import org.springframework.web.client.RestTemplate;
 /**
  * Web 관련 설정 클래스
  *
- * @author : 송학현
- * @since : 1.0
+ * @author 송학현
+ * @since 1.0
  */
 @Configuration
 public class WebConfiguration {
@@ -20,8 +20,8 @@ public class WebConfiguration {
      *
      * @param clientHttpRequestFactory client, server 커넥션 설정 factory class.
      * @return RestTemplate 반환.
-     * @author : 송학현
-     * @since : 1.0
+     * @author 송학현
+     * @since 1.0
      */
     @Bean
     public RestTemplate restTemplate(ClientHttpRequestFactory clientHttpRequestFactory) {
@@ -32,8 +32,8 @@ public class WebConfiguration {
      * client와 server간 connection 객체를 생성 및 타임아웃 등의 설정을 위한 Bean 설정
      *
      * @return ClientHttpRequestFactory의 구현체 SimpleClientHttpRequestFactory
-     * @author : 송학현
-     * @since : 1.0
+     * @author 송학현
+     * @since 1.0
      */
     @Bean
     public ClientHttpRequestFactory clientHttpRequestFactory() {
