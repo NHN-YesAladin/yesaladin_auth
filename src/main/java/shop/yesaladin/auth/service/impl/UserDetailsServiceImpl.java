@@ -1,4 +1,4 @@
-package shop.yesaladin.auth.service;
+package shop.yesaladin.auth.service.impl;
 
 import java.util.Objects;
 import java.util.stream.Collectors;
