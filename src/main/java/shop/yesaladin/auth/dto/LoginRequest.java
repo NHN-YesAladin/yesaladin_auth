@@ -9,8 +9,8 @@ import lombok.ToString;
 /**
  * 로그인을 위한 요청 DTO 입니다.
  *
- * @author : 송학현
- * @since : 1.0
+ * @author 송학현
+ * @since 1.0
  */
 @Getter
 @Setter
