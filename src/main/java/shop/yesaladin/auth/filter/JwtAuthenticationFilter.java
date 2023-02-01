@@ -16,7 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import shop.yesaladin.auth.dto.LoginRequest;
+import shop.yesaladin.auth.dto.LoginRequestDto;
 import shop.yesaladin.auth.exception.InvalidLoginRequestException;
 import shop.yesaladin.auth.jwt.JwtTokenProvider;
 
@@ -56,18 +56,18 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             HttpServletRequest request, HttpServletResponse response
     ) throws AuthenticationException {
         ObjectMapper mapper = new ObjectMapper();
-        LoginRequest loginRequest;
+        LoginRequestDto loginRequestDto;
         try {
-            loginRequest = mapper.readValue(request.getInputStream(), LoginRequest.class);
-            log.info("loginId={}", loginRequest.getLoginId());
-            log.info("password={}", loginRequest.getPassword());
+            loginRequestDto = mapper.readValue(request.getInputStream(), LoginRequestDto.class);
+            log.info("loginId={}", loginRequestDto.getLoginId());
+            log.info("password={}", loginRequestDto.getPassword());
         } catch (IOException e) {
             throw new InvalidLoginRequestException();
         }
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                loginRequest.getLoginId(),
-                loginRequest.getPassword()
+                loginRequestDto.getLoginId(),
+                loginRequestDto.getPassword()
         );
 
         log.info("authenticationToken.getName={}", authenticationToken.getName());
