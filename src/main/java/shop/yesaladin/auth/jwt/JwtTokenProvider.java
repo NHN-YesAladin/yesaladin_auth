@@ -63,7 +63,6 @@ public class JwtTokenProvider {
      * @since 1.0
      */
     public String createToken(String loginId, Authentication roles, long tokenExpireTime) {
-
         Claims claims = Jwts.claims().setSubject(loginId);
         claims.put("roles",
                 roles.getAuthorities()
@@ -148,6 +147,11 @@ public class JwtTokenProvider {
             return false;
         }
         return true;
+    }
+
+    // TODO: 토큰 재발급 구현
+    public void tokenReissue() {
+
     }
 
     /**
