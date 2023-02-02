@@ -17,7 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import shop.yesaladin.auth.dto.MemberResponse;
+import shop.yesaladin.auth.dto.MemberResponseDto;
 import shop.yesaladin.common.dto.ResponseDto;
 
 /**
@@ -47,7 +47,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
-        ResponseEntity<ResponseDto<MemberResponse>> response = restTemplate.exchange(
+        ResponseEntity<ResponseDto<MemberResponseDto>> response = restTemplate.exchange(
                 shopUrl + "/v1/members/login/" + loginId,
                 HttpMethod.GET,
                 new HttpEntity<>(new HttpHeaders()),
@@ -56,7 +56,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         );
         log.info("response={}", response);
 
-        MemberResponse member = response.getBody().getData();
+        MemberResponseDto member = response.getBody().getData();
 
         log.info("UserDetailsServiceImpl, member={}", member);
 
