@@ -8,6 +8,7 @@ import static shop.yesaladin.auth.util.AuthUtil.USER_ID;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +21,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import shop.yesaladin.auth.dto.LoginRequestDto;
 import shop.yesaladin.auth.exception.InvalidLoginRequestException;
@@ -135,7 +137,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private String getAccessToken(Authentication auth) {
         return jwtTokenProvider.createAccessToken(
                 auth.getName(),
-                auth
+                auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(
+                        Collectors.toList())
         );
     }
 
@@ -150,7 +153,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private String getRefreshToken(Authentication auth) {
         return jwtTokenProvider.createRefreshToken(
                 auth.getName(),
-                auth
+                auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(
+                        Collectors.toList())
         );
     }
 

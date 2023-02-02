@@ -1,7 +1,5 @@
 package shop.yesaladin.auth.jwt;
 
-import static java.util.stream.Collectors.toList;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -11,15 +9,16 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.time.Duration;
 import java.util.Date;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
+import shop.yesaladin.auth.dto.TokenReissueResponseDto;
 
 /**
  * JWT Token을 생성하기 위한 Provider 입니다.
@@ -31,7 +30,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class JwtTokenProvider {
 
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = Duration.ofMinutes(1).toMillis(); // 30 minutes
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = Duration.ofMinutes(30).toMillis(); // 30 minutes
     private static final long REFRESH_TOKEN_EXPIRE_TIME = Duration.ofDays(7).toMillis(); // 7 days
 
     private final UserDetailsService userDetailsService;
@@ -62,13 +61,9 @@ public class JwtTokenProvider {
      * @author 송학현
      * @since 1.0
      */
-    public String createToken(String loginId, Authentication roles, long tokenExpireTime) {
+    public String createToken(String loginId, List<String> roles, long tokenExpireTime) {
         Claims claims = Jwts.claims().setSubject(loginId);
-        claims.put("roles",
-                roles.getAuthorities()
-                        .stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .collect(toList()));
+        claims.put("roles", roles);
         Date date = new Date();
 
         return Jwts.builder()
@@ -83,32 +78,32 @@ public class JwtTokenProvider {
      * accessToken을 발급하는 기능입니다.
      *
      * @param loginId 회원의 loginId 입니다.
-     * @param auth 회원의 정보를 담고 있는 인증 객체 입니다.
+     * @param roles 회원의 권한 목록입니다.
      * @return JWT 토큰으로 발급한 accessToken을 반환합니다.
      * @author 송학현
      * @since 1.0
      */
     public String createAccessToken(
             String loginId,
-            Authentication auth
+            List<String> roles
     ) {
-        return createToken(loginId, auth, ACCESS_TOKEN_EXPIRE_TIME);
+        return createToken(loginId, roles, ACCESS_TOKEN_EXPIRE_TIME);
     }
 
     /**
      * refreshToken을 발급하는 기능입니다.
      *
      * @param loginId 회원의 loginId 입니다.
-     * @param auth 회원의 정보를 담고 있는 인증 객체 입니다.
+     * @param roles 회원의 권한 목록입니다.
      * @return JWT 토큰으로 발급한 refreshToken 반환합니다.
      * @author 송학현
      * @since 1.0
      */
     public String createRefreshToken(
             String loginId,
-            Authentication auth
+            List<String> roles
     ) {
-        return createToken(loginId, auth, REFRESH_TOKEN_EXPIRE_TIME);
+        return createToken(loginId, roles, REFRESH_TOKEN_EXPIRE_TIME);
     }
 
     /**
@@ -149,12 +144,26 @@ public class JwtTokenProvider {
         return true;
     }
 
-    // TODO: 토큰 재발급 구현
-    public void tokenReissue(String accessToken) {
-        log.info("accessToken={}", accessToken);
-
-        String loginId = extractLoginId(accessToken);
+    /**
+     * JWT 토큰을 재발급 하는 기능입니다.
+     *
+     * @param loginId Token을 재발급 하기 위해 필요한 회원의 loginId 입니다.
+     * @param roles Token을 재발급 하기 위해 필요한 회원의 권한 리스트 입니다.
+     * @return 재발급한 accessToken과 refreshToken을 담은 DTO 결과
+     * @author 송학현
+     * @since 1.0
+     */
+    public TokenReissueResponseDto tokenReissue(String loginId, List<String> roles) {
         log.info("loginId={}", loginId);
+        log.info("roles={}", roles);
+
+        String accessToken = createAccessToken(loginId, roles);
+        String refreshToken = createRefreshToken(loginId, roles);
+
+        log.info("accessToken={}", accessToken);
+        log.info("refreshToken={}", refreshToken);
+
+        return new TokenReissueResponseDto(accessToken, refreshToken);
     }
 
     /**
