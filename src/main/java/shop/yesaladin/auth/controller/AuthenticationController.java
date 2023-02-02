@@ -1,10 +1,6 @@
 package shop.yesaladin.auth.controller;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static shop.yesaladin.auth.util.AuthUtil.ACCESS_TOKEN;
-import static shop.yesaladin.auth.util.AuthUtil.PRINCIPALS;
-import static shop.yesaladin.auth.util.AuthUtil.REFRESH_TOKEN;
-import static shop.yesaladin.auth.util.AuthUtil.USER_ID;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -24,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import shop.yesaladin.auth.dto.LogoutRequestDto;
 import shop.yesaladin.auth.dto.TokenReissueResponseDto;
 import shop.yesaladin.auth.jwt.JwtTokenProvider;
+import shop.yesaladin.auth.service.inter.AuthenticationService;
 import shop.yesaladin.common.dto.ResponseDto;
 
 /**
@@ -40,6 +37,7 @@ public class AuthenticationController {
 
     private final JwtTokenProvider tokenProvider;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final AuthenticationService authenticationService;
 
     private static final String UUID_HEADER = "UUID_HEADER";
 
@@ -62,31 +60,21 @@ public class AuthenticationController {
         log.info("uuid={}", memberUuid);
         log.info("accessToken={}", accessToken);
 
-        if (Objects.isNull(accessToken) || Objects.isNull(memberUuid) || tokenProvider.isValidToken(accessToken)) {
+        if (isValidHeader(accessToken, memberUuid)) {
             throw new IllegalArgumentException("Header 정보가 없거나 유효하지 않은 토큰입니다.");
         }
 
-        if (!redisTemplate.opsForHash().keys(memberUuid).isEmpty()) {
-            String loginId = redisTemplate.opsForHash()
-                    .get(memberUuid, USER_ID.getValue())
-                    .toString();
-            String principals = redisTemplate.opsForHash()
-                    .get(memberUuid, PRINCIPALS.getValue())
-                    .toString();
+        if (isValidKey(memberUuid)) {
+            String loginId = authenticationService.getLoginId(memberUuid);
+            String principals = authenticationService.getPrincipals(memberUuid);
             log.info("loginId={}", loginId);
             log.info("roles={}", principals);
 
-            List<String> roles = splitRoles(principals);
+            List<String> roles = extractUserRoles(principals);
 
             TokenReissueResponseDto tokenReissueResponseDto = tokenProvider.tokenReissue(loginId, roles);
 
-            redisTemplate.opsForHash().delete(memberUuid, ACCESS_TOKEN.getValue());
-            redisTemplate.opsForHash().delete(memberUuid, REFRESH_TOKEN.getValue());
-
-            redisTemplate.opsForHash()
-                    .put(memberUuid, REFRESH_TOKEN.getValue(), tokenReissueResponseDto.getRefreshToken());
-            redisTemplate.opsForHash()
-                    .put(memberUuid, ACCESS_TOKEN.getValue(), tokenReissueResponseDto.getAccessToken());
+            authenticationService.doReissue(memberUuid, tokenReissueResponseDto);
 
             response.addHeader(AUTHORIZATION, tokenReissueResponseDto.getAccessToken());
             response.addHeader(UUID_HEADER, memberUuid);
@@ -104,7 +92,27 @@ public class AuthenticationController {
                 .build();
     }
 
-    private List<String> splitRoles(String principals) {
+    /**
+     * 로그아웃, 토큰 재발급 처리에 앞서 식별 키가 Redis에 유효한 지 판단 하기 위한 기능 입니다.
+     *
+     * @param memberUuid 로그인 된 회원이 갖고 있는 유일한 식별 키 입니다.
+     * @return Redis에 접근 하기 전 key 값이 유효한지에 대한 결과 입니다.
+     * @author 송학현
+     * @since 1.0
+     */
+    private boolean isValidKey(String memberUuid) {
+        return !redisTemplate.opsForHash().keys(memberUuid).isEmpty();
+    }
+
+    /**
+     * Redis에 String 형태로 저장되어 있는 회원의 권한 정보를 정제하여 List로 추출하기 위한 기능 입니다.
+     *
+     * @param principals Redis에 저장되어 있던 회원의 권한 정보입니다.
+     * @return 권한 정보를 List로 추출한 결과 입니다.
+     * @author 송학현
+     * @since 1.0
+     */
+    private List<String> extractUserRoles(String principals) {
         return Arrays.asList(principals.replaceAll("[\\[\\]]", "").split(", "));
     }
 
@@ -123,17 +131,14 @@ public class AuthenticationController {
     ) {
         String uuid = request.getKey();
         log.info("uuid={}", uuid);
+        log.info("accessToken={}", accessToken);
 
-        if (Objects.isNull(accessToken) || Objects.isNull(uuid) || !accessToken.startsWith(
-                "Bearer ") || tokenProvider.isValidToken(accessToken.substring(7))) {
+        if (isValidHeader(accessToken, uuid)) {
             throw new IllegalArgumentException("Header 정보가 없거나 유효하지 않은 토큰입니다.");
         }
 
-        if (!redisTemplate.opsForHash().keys(uuid).isEmpty()) {
-            redisTemplate.opsForHash().delete(uuid, REFRESH_TOKEN.getValue());
-            redisTemplate.opsForHash().delete(uuid, ACCESS_TOKEN.getValue());
-            redisTemplate.opsForHash().delete(uuid, PRINCIPALS.getValue());
-            redisTemplate.opsForHash().delete(uuid, USER_ID.getValue());
+        if (isValidKey(uuid)) {
+            authenticationService.doLogout(uuid);
 
             return ResponseDto.<Void>builder()
                     .success(true)
@@ -146,5 +151,19 @@ public class AuthenticationController {
                 .status(HttpStatus.BAD_REQUEST)
                 .errorMessages(List.of("이미 로그아웃 된 사용자 입니다."))
                 .build();
+    }
+
+    /**
+     * 토큰 재발급, 로그아웃 요청에 대해 유효한 Request Header 정보를 갖고 있는지 판단하는 기능입니다.
+     *
+     * @param accessToken Authorization Header에 들어있는 JWT 토큰 입니다.
+     * @param memberUuid 로그인 된 회원이 갖고 있는 유일한 식별 키 입니다.
+     * @return Request Header가 유효한지에 대한 결과 입니다.
+     * @author 송학현
+     * @since 1.0
+     */
+    private boolean isValidHeader(String accessToken, String memberUuid) {
+        return Objects.isNull(accessToken) || Objects.isNull(memberUuid) || !accessToken.startsWith(
+                "Bearer ") || !tokenProvider.isValidToken(accessToken.substring(7));
     }
 }
