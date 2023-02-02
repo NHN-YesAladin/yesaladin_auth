@@ -1,5 +1,10 @@
 package shop.yesaladin.auth.filter;
 
+import static shop.yesaladin.auth.util.AuthUtil.ACCESS_TOKEN;
+import static shop.yesaladin.auth.util.AuthUtil.PRINCIPALS;
+import static shop.yesaladin.auth.util.AuthUtil.REFRESH_TOKEN;
+import static shop.yesaladin.auth.util.AuthUtil.USER_ID;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.UUID;
@@ -32,7 +37,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
-    private static final String REFRESH_TOKEN = "REFRESH_TOKEN";
     private static final String UUID_HEADER = "UUID_HEADER";
 
     private final AuthenticationManager authenticationManager;
@@ -108,7 +112,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         String memberUuid = UUID.randomUUID().toString();
 
-        redisTemplate.opsForHash().put(auth.getName(), REFRESH_TOKEN, refreshToken);
+        redisTemplate.opsForHash().put(memberUuid, REFRESH_TOKEN.getValue(), refreshToken);
+        redisTemplate.opsForHash().put(memberUuid, ACCESS_TOKEN.getValue(), accessToken);
+        redisTemplate.opsForHash().put(memberUuid, USER_ID.getValue(), auth.getName());
+        redisTemplate.opsForHash().put(memberUuid, PRINCIPALS.getValue(), auth.getAuthorities().toString());
 
         log.info("accessToken={}", accessToken);
         log.info("refreshToken={}", refreshToken);
