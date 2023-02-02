@@ -59,8 +59,10 @@ public class AuthenticationController {
         String accessToken = request.getHeader(AUTHORIZATION);
         String memberUuid = request.getHeader("UUID");
 
-        if (Objects.isNull(accessToken) || Objects.isNull(memberUuid) || !accessToken.startsWith(
-                "Bearer ") || tokenProvider.isValidToken(accessToken.substring(7))) {
+        log.info("uuid={}", memberUuid);
+        log.info("accessToken={}", accessToken);
+
+        if (Objects.isNull(accessToken) || Objects.isNull(memberUuid) || tokenProvider.isValidToken(accessToken)) {
             throw new IllegalArgumentException("Header 정보가 없거나 유효하지 않은 토큰입니다.");
         }
 
