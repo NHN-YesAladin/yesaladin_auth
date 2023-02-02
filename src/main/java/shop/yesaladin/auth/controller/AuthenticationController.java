@@ -43,7 +43,6 @@ public class AuthenticationController {
 
     private static final String UUID_HEADER = "UUID_HEADER";
 
-
     /**
      * JWT 토큰 재발급을 위한 기능입니다.
      *
