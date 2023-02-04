@@ -1,8 +1,14 @@
 package shop.yesaladin.auth.filter;
 
+import static shop.yesaladin.auth.util.AuthUtil.ACCESS_TOKEN;
+import static shop.yesaladin.auth.util.AuthUtil.PRINCIPALS;
+import static shop.yesaladin.auth.util.AuthUtil.REFRESH_TOKEN;
+import static shop.yesaladin.auth.util.AuthUtil.USER_ID;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -15,8 +21,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import shop.yesaladin.auth.dto.LoginRequest;
+import shop.yesaladin.auth.dto.LoginRequestDto;
 import shop.yesaladin.auth.exception.InvalidLoginRequestException;
 import shop.yesaladin.auth.jwt.JwtTokenProvider;
 
@@ -32,8 +39,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
-    private static final String REFRESH_TOKEN = "REFRESH_TOKEN";
-    private static final String ACCESS_TOKEN = "ACCESS_TOKEN";
     private static final String UUID_HEADER = "UUID_HEADER";
 
     private final AuthenticationManager authenticationManager;
@@ -57,18 +62,18 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             HttpServletRequest request, HttpServletResponse response
     ) throws AuthenticationException {
         ObjectMapper mapper = new ObjectMapper();
-        LoginRequest loginRequest;
+        LoginRequestDto loginRequestDto;
         try {
-            loginRequest = mapper.readValue(request.getInputStream(), LoginRequest.class);
-            log.info("loginId={}", loginRequest.getLoginId());
-            log.info("password={}", loginRequest.getPassword());
+            loginRequestDto = mapper.readValue(request.getInputStream(), LoginRequestDto.class);
+            log.info("loginId={}", loginRequestDto.getLoginId());
+            log.info("password={}", loginRequestDto.getPassword());
         } catch (IOException e) {
             throw new InvalidLoginRequestException();
         }
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                loginRequest.getLoginId(),
-                loginRequest.getPassword()
+                loginRequestDto.getLoginId(),
+                loginRequestDto.getPassword()
         );
 
         log.info("authenticationToken.getName={}", authenticationToken.getName());
@@ -109,7 +114,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         String memberUuid = UUID.randomUUID().toString();
 
-        redisTemplate.opsForHash().put(auth.getName(), REFRESH_TOKEN, refreshToken);
+        redisTemplate.opsForHash().put(memberUuid, REFRESH_TOKEN.getValue(), refreshToken);
+        redisTemplate.opsForHash().put(memberUuid, ACCESS_TOKEN.getValue(), accessToken);
+        redisTemplate.opsForHash().put(memberUuid, USER_ID.getValue(), auth.getName());
+        redisTemplate.opsForHash().put(memberUuid, PRINCIPALS.getValue(), auth.getAuthorities().toString());
 
         log.info("accessToken={}", accessToken);
         log.info("refreshToken={}", refreshToken);
@@ -129,7 +137,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private String getAccessToken(Authentication auth) {
         return jwtTokenProvider.createAccessToken(
                 auth.getName(),
-                auth
+                auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(
+                        Collectors.toList())
         );
     }
 
@@ -144,7 +153,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private String getRefreshToken(Authentication auth) {
         return jwtTokenProvider.createRefreshToken(
                 auth.getName(),
-                auth
+                auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(
+                        Collectors.toList())
         );
     }
 
