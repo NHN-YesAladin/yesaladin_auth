@@ -3,6 +3,7 @@ package shop.yesaladin.auth.controller;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -40,6 +41,7 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     private static final String UUID_HEADER = "UUID_HEADER";
+    private static final String X_EXPIRE_HEADER = "X-Expire";
 
     /**
      * JWT 토큰 재발급을 위한 기능입니다.
@@ -76,8 +78,12 @@ public class AuthenticationController {
 
             authenticationService.doReissue(memberUuid, tokenReissueResponseDto);
 
-            response.addHeader(AUTHORIZATION, tokenReissueResponseDto.getAccessToken());
+            String reissuedToken = tokenReissueResponseDto.getAccessToken();
+            LocalDateTime expiredTime = tokenProvider.extractExpiredTime(reissuedToken);
+
+            response.addHeader(AUTHORIZATION, reissuedToken);
             response.addHeader(UUID_HEADER, memberUuid);
+            response.addHeader(X_EXPIRE_HEADER, String.valueOf(expiredTime));
             return ResponseDto.<Void>builder()
                     .success(true)
                     .status(HttpStatus.OK)
