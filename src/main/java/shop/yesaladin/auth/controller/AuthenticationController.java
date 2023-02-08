@@ -1,9 +1,12 @@
 package shop.yesaladin.auth.controller;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static shop.yesaladin.auth.util.AuthUtil.REFRESH_TOKEN;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -19,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import shop.yesaladin.auth.dto.LogoutRequestDto;
-import shop.yesaladin.auth.dto.TokenReissueResponseDto;
 import shop.yesaladin.auth.jwt.JwtTokenProvider;
 import shop.yesaladin.auth.service.inter.AuthenticationService;
 import shop.yesaladin.common.dto.ResponseDto;
@@ -67,36 +69,54 @@ public class AuthenticationController {
             throw new IllegalArgumentException("Header 정보가 없거나 유효하지 않은 토큰입니다.");
         }
 
-        if (isValidKey(memberUuid)) {
-            String loginId = authenticationService.getLoginId(memberUuid);
-            String principals = authenticationService.getPrincipals(memberUuid);
-            log.info("loginId={}", loginId);
-            log.info("roles={}", principals);
-
-            List<String> roles = extractUserRoles(principals);
-
-            TokenReissueResponseDto tokenReissueResponseDto = tokenProvider.tokenReissue(loginId, roles);
-
-            authenticationService.doReissue(memberUuid, tokenReissueResponseDto);
-
-            String reissuedToken = tokenReissueResponseDto.getAccessToken();
-            LocalDateTime expiredTime = tokenProvider.extractExpiredTime(reissuedToken);
-
-            response.addHeader(AUTHORIZATION, reissuedToken);
-            response.addHeader(UUID_HEADER, memberUuid);
-            response.addHeader(X_EXPIRE_HEADER, String.valueOf(expiredTime));
+        if (!isValidKey(memberUuid)) {
+            log.error("uuid 없음");
             return ResponseDto.<Void>builder()
-                    .success(true)
-                    .status(HttpStatus.OK)
+                    .success(false)
+                    .status(HttpStatus.BAD_REQUEST)
+                    .errorMessages(List.of("이미 로그아웃 된 사용자 입니다."))
                     .build();
         }
 
-        log.error("uuid 없음");
+        if (!isValidRefreshToken(memberUuid)) {
+            return ResponseDto.<Void>builder()
+                    .success(false)
+                    .status(HttpStatus.BAD_REQUEST)
+                    .errorMessages(List.of("RefreshToken이 만료 되었습니다."))
+                    .build();
+        }
+
+        String loginId = authenticationService.getLoginId(memberUuid);
+        String principals = authenticationService.getPrincipals(memberUuid);
+        log.info("loginId={}", loginId);
+        log.info("roles={}", principals);
+
+        List<String> roles = extractUserRoles(principals);
+
+        String reissuedToken = tokenProvider.tokenReissue(loginId, roles);
+
+        authenticationService.doReissue(memberUuid, reissuedToken);
+
+        LocalDateTime expiredTime = tokenProvider.extractExpiredTime(reissuedToken);
+
+        response.addHeader(AUTHORIZATION, reissuedToken);
+        response.addHeader(UUID_HEADER, memberUuid);
+        response.addHeader(X_EXPIRE_HEADER, String.valueOf(expiredTime));
         return ResponseDto.<Void>builder()
-                .success(false)
-                .status(HttpStatus.BAD_REQUEST)
-                .errorMessages(List.of("이미 로그아웃 된 사용자 입니다."))
+                .success(true)
+                .status(HttpStatus.OK)
                 .build();
+    }
+
+    private boolean isValidRefreshToken(String memberUuid) {
+        String refreshToken = Objects.requireNonNull(redisTemplate.opsForHash()
+                        .get(memberUuid, REFRESH_TOKEN.getValue()))
+                        .toString();
+
+        LocalDateTime expiredTime = tokenProvider.extractExpiredTime(refreshToken);
+
+        return Duration.between(LocalDateTime.now(ZoneId.of("Asia/Seoul")), expiredTime)
+                .toMillis() > 0;
     }
 
     /**
@@ -165,7 +185,7 @@ public class AuthenticationController {
      * 토큰 재발급, 로그아웃 요청에 대해 유효한 Request Header 정보를 갖고 있는지 판단하는 기능입니다.
      *
      * @param accessToken Authorization Header에 들어있는 JWT 토큰 입니다.
-     * @param memberUuid 로그인 된 회원이 갖고 있는 유일한 식별 키 입니다.
+     * @param memberUuid  로그인 된 회원이 갖고 있는 유일한 식별 키 입니다.
      * @return Request Header가 유효한지에 대한 결과 입니다.
      * @author 송학현
      * @since 1.0
