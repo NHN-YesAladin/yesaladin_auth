@@ -7,6 +7,7 @@ import static shop.yesaladin.auth.util.AuthUtil.USER_ID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.servlet.FilterChain;
@@ -40,6 +41,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
     private static final String UUID_HEADER = "UUID_HEADER";
+    private static final String X_EXPIRE_HEADER = "X-Expire";
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
@@ -112,6 +114,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String accessToken = getAccessToken(auth);
         String refreshToken = getRefreshToken(auth);
 
+        LocalDateTime expiredTime = jwtTokenProvider.extractExpiredTime(accessToken);
+        log.info("expiredTime={}", expiredTime);
         String memberUuid = UUID.randomUUID().toString();
 
         redisTemplate.opsForHash().put(memberUuid, REFRESH_TOKEN.getValue(), refreshToken);
@@ -124,6 +128,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         response.addHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + accessToken);
         response.addHeader(UUID_HEADER, memberUuid);
+        response.addHeader(X_EXPIRE_HEADER, String.valueOf(expiredTime));
     }
 
     /**

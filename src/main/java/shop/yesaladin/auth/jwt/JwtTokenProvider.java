@@ -8,6 +8,8 @@ import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ import shop.yesaladin.auth.dto.TokenReissueResponseDto;
 
 /**
  * JWT Token을 생성하기 위한 Provider 입니다.
+ *
  * @author 송학현
  * @since 1.0
  */
@@ -30,7 +33,8 @@ import shop.yesaladin.auth.dto.TokenReissueResponseDto;
 @RequiredArgsConstructor
 public class JwtTokenProvider {
 
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = Duration.ofMinutes(30).toMillis(); // 30 minutes
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = Duration.ofMinutes(30)
+            .toMillis(); // 30 minutes
     private static final long REFRESH_TOKEN_EXPIRE_TIME = Duration.ofDays(7).toMillis(); // 7 days
 
     private final UserDetailsService userDetailsService;
@@ -54,8 +58,8 @@ public class JwtTokenProvider {
     /**
      * JWT 토큰을 발급 하는 기능 입니다.
      *
-     * @param loginId 회원의 loginId 입니다.
-     * @param roles 회원의 권한 목록입니다.
+     * @param loginId         회원의 loginId 입니다.
+     * @param roles           회원의 권한 목록입니다.
      * @param tokenExpireTime 토큰의 유효 시간입니다.
      * @return 발급한 JWT 토큰을 반환합니다.
      * @author 송학현
@@ -78,7 +82,7 @@ public class JwtTokenProvider {
      * accessToken을 발급하는 기능입니다.
      *
      * @param loginId 회원의 loginId 입니다.
-     * @param roles 회원의 권한 목록입니다.
+     * @param roles   회원의 권한 목록입니다.
      * @return JWT 토큰으로 발급한 accessToken을 반환합니다.
      * @author 송학현
      * @since 1.0
@@ -94,7 +98,7 @@ public class JwtTokenProvider {
      * refreshToken을 발급하는 기능입니다.
      *
      * @param loginId 회원의 loginId 입니다.
-     * @param roles 회원의 권한 목록입니다.
+     * @param roles   회원의 권한 목록입니다.
      * @return JWT 토큰으로 발급한 refreshToken 반환합니다.
      * @author 송학현
      * @since 1.0
@@ -145,10 +149,28 @@ public class JwtTokenProvider {
     }
 
     /**
+     * JWT 토큰의 만료 시간을 추출하기 위한 기능 입니다.
+     *
+     * @param token JWT 토큰입니다.
+     * @return 토큰의 만료 시간을 LocalDateTime으로 변환한 결과
+     * @author 송학현
+     * @since 1.0
+     */
+    public LocalDateTime extractExpiredTime(String token) {
+        Date expiration = Jwts.parserBuilder()
+                .setSigningKey(getSecretKey(secretKey))
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration();
+        return convertLocalDateTime(expiration);
+    }
+
+    /**
      * JWT 토큰을 재발급 하는 기능입니다.
      *
      * @param loginId Token을 재발급 하기 위해 필요한 회원의 loginId 입니다.
-     * @param roles Token을 재발급 하기 위해 필요한 회원의 권한 리스트 입니다.
+     * @param roles   Token을 재발급 하기 위해 필요한 회원의 권한 리스트 입니다.
      * @return 재발급한 accessToken과 refreshToken을 담은 DTO 결과
      * @author 송학현
      * @since 1.0
@@ -181,5 +203,9 @@ public class JwtTokenProvider {
                 "",
                 userDetails.getAuthorities()
         );
+    }
+
+    private LocalDateTime convertLocalDateTime(Date expiration) {
+        return LocalDateTime.ofInstant(expiration.toInstant(), ZoneId.of("Asia/Seoul"));
     }
 }

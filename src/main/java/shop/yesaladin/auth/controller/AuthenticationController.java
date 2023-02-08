@@ -3,6 +3,7 @@ package shop.yesaladin.auth.controller;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -40,6 +41,7 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     private static final String UUID_HEADER = "UUID_HEADER";
+    private static final String X_EXPIRE_HEADER = "X-Expire";
 
     /**
      * JWT 토큰 재발급을 위한 기능입니다.
@@ -61,6 +63,7 @@ public class AuthenticationController {
         log.info("accessToken={}", accessToken);
 
         if (isValidHeader(accessToken, memberUuid)) {
+            // TODO: 공통 예외 핸들링 추가
             throw new IllegalArgumentException("Header 정보가 없거나 유효하지 않은 토큰입니다.");
         }
 
@@ -76,8 +79,12 @@ public class AuthenticationController {
 
             authenticationService.doReissue(memberUuid, tokenReissueResponseDto);
 
-            response.addHeader(AUTHORIZATION, tokenReissueResponseDto.getAccessToken());
+            String reissuedToken = tokenReissueResponseDto.getAccessToken();
+            LocalDateTime expiredTime = tokenProvider.extractExpiredTime(reissuedToken);
+
+            response.addHeader(AUTHORIZATION, reissuedToken);
             response.addHeader(UUID_HEADER, memberUuid);
+            response.addHeader(X_EXPIRE_HEADER, String.valueOf(expiredTime));
             return ResponseDto.<Void>builder()
                     .success(true)
                     .status(HttpStatus.OK)
@@ -134,6 +141,7 @@ public class AuthenticationController {
         log.info("accessToken={}", accessToken);
 
         if (isValidHeader(accessToken, uuid)) {
+            // TODO: 예외 핸들링
             throw new IllegalArgumentException("Header 정보가 없거나 유효하지 않은 토큰입니다.");
         }
 

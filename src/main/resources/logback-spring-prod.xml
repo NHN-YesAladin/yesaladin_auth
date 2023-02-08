@@ -2,15 +2,29 @@
 <configuration>
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
     <springProperty scope="context" name="application_name" source="spring.application.name"/>
-    <springProperty scope="context" name="logstash_connect_info"
-            source="log.logstash.connect-info"/>
     <springProperty scope="context" name="profile" source="spring.profiles.active"/>
-    <appender name="logstash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <destination>${logstash_connect_info}</destination>
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+    <springProperty scope="context" name="logncrash_app_key" source="log.logncrash.app-key" />
+    <appender name="logncrash" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- Logback의 AsyncAppender 옵션 -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <param name="includeCallerData" value="false"/>
+        <param name="queueSize" value="2048"/>
+        <param name="neverBlock" value="true"/>
+        <param name="maxFlushTime" value="60000"/>
+
+        <!-- Log & Crash Logback SDK의 LogNCrashHttpAppender 옵션 -->
+        <appender name="logNCrashHttp" class="com.toast.java.logncrash.logback.LogNCrashHttpAppender">
+            <param name="appKey" value="${logncrash_app_key}"/>
+            <param name="logSource" value="${profile}"/>
+            <param name="version" value="1.0.0"/>
+            <param name="category" value="${application_name}"/>
+            <param name="errorCodeType" value="action"/>
+        </appender>
     </appender>
     <root level="INFO">
-        <appender-ref ref="logstash"/>
+        <appender-ref ref="logncrash"/>
         <appender-ref ref="CONSOLE"/>
     </root>
     <logger name="org.springframework" level="INFO"/>
