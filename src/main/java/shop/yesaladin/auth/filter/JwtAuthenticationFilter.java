@@ -115,6 +115,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String refreshToken = getRefreshToken(auth);
 
         LocalDateTime expiredTime = jwtTokenProvider.extractExpiredTime(accessToken);
+        log.info("expiredTime={}", expiredTime);
         String memberUuid = UUID.randomUUID().toString();
 
         redisTemplate.opsForHash().put(memberUuid, REFRESH_TOKEN.getValue(), refreshToken);

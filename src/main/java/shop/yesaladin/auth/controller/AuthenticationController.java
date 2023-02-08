@@ -63,6 +63,7 @@ public class AuthenticationController {
         log.info("accessToken={}", accessToken);
 
         if (isValidHeader(accessToken, memberUuid)) {
+            // TODO: 공통 예외 핸들링 추가
             throw new IllegalArgumentException("Header 정보가 없거나 유효하지 않은 토큰입니다.");
         }
 
@@ -140,6 +141,7 @@ public class AuthenticationController {
         log.info("accessToken={}", accessToken);
 
         if (isValidHeader(accessToken, uuid)) {
+            // TODO: 예외 핸들링
             throw new IllegalArgumentException("Header 정보가 없거나 유효하지 않은 토큰입니다.");
         }
 
