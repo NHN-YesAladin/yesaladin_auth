@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import shop.yesaladin.auth.dto.TokenReissueResponseDto;
 import shop.yesaladin.auth.service.inter.AuthenticationService;
 
 /**
@@ -50,10 +49,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
      * {@inheritDoc}
      */
     @Override
-    public void doReissue(String memberUuid, TokenReissueResponseDto dto) {
+    public void doReissue(String memberUuid, String accessToken) {
         redisTemplate.opsForHash().delete(memberUuid, ACCESS_TOKEN.getValue());
         redisTemplate.opsForHash()
-                .put(memberUuid, ACCESS_TOKEN.getValue(), dto.getAccessToken());
+                .put(memberUuid, ACCESS_TOKEN.getValue(), accessToken);
     }
 
     /**
