@@ -52,10 +52,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void doReissue(String memberUuid, TokenReissueResponseDto dto) {
         redisTemplate.opsForHash().delete(memberUuid, ACCESS_TOKEN.getValue());
-        redisTemplate.opsForHash().delete(memberUuid, REFRESH_TOKEN.getValue());
-
-        redisTemplate.opsForHash()
-                .put(memberUuid, REFRESH_TOKEN.getValue(), dto.getRefreshToken());
         redisTemplate.opsForHash()
                 .put(memberUuid, ACCESS_TOKEN.getValue(), dto.getAccessToken());
     }
