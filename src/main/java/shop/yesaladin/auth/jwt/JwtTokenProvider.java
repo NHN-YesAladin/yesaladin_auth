@@ -21,7 +21,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
-import shop.yesaladin.auth.dto.TokenReissueResponseDto;
 
 /**
  * JWT Token을 생성하기 위한 Provider 입니다.
@@ -172,21 +171,19 @@ public class JwtTokenProvider {
      *
      * @param loginId Token을 재발급 하기 위해 필요한 회원의 loginId 입니다.
      * @param roles   Token을 재발급 하기 위해 필요한 회원의 권한 리스트 입니다.
-     * @return 재발급한 accessToken과 refreshToken을 담은 DTO 결과
+     * @return 재발급한 accessToken
      * @author 송학현
      * @since 1.0
      */
-    public TokenReissueResponseDto tokenReissue(String loginId, List<String> roles) {
+    public String tokenReissue(String loginId, List<String> roles) {
         log.info("loginId={}", loginId);
         log.info("roles={}", roles);
 
         String accessToken = createAccessToken(loginId, roles);
-        String refreshToken = createRefreshToken(loginId, roles);
 
         log.info("accessToken={}", accessToken);
-        log.info("refreshToken={}", refreshToken);
 
-        return new TokenReissueResponseDto(accessToken, refreshToken);
+        return accessToken;
     }
 
     /**
