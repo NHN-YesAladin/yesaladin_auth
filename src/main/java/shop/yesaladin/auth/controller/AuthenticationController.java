@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import shop.yesaladin.auth.dto.LogoutRequestDto;
+import shop.yesaladin.auth.exception.InvalidAuthorizationHeaderException;
 import shop.yesaladin.auth.jwt.JwtTokenProvider;
 import shop.yesaladin.auth.service.inter.AuthenticationService;
 import shop.yesaladin.common.dto.ResponseDto;
@@ -65,8 +66,7 @@ public class AuthenticationController {
         log.info("accessToken={}", accessToken);
 
         if (isValidHeader(accessToken, memberUuid)) {
-            // TODO: 공통 예외 핸들링 추가
-            throw new IllegalArgumentException("Header 정보가 없거나 유효하지 않은 토큰입니다.");
+            throw new InvalidAuthorizationHeaderException();
         }
 
         if (!isValidKey(memberUuid)) {
@@ -161,8 +161,7 @@ public class AuthenticationController {
         log.info("accessToken={}", accessToken);
 
         if (isValidHeader(accessToken, uuid)) {
-            // TODO: 예외 핸들링
-            throw new IllegalArgumentException("Header 정보가 없거나 유효하지 않은 토큰입니다.");
+            throw new InvalidAuthorizationHeaderException();
         }
 
         if (isValidKey(uuid)) {
