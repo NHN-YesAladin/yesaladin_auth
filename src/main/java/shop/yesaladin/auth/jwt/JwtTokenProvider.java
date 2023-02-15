@@ -8,8 +8,6 @@ import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -155,14 +153,13 @@ public class JwtTokenProvider {
      * @author 송학현
      * @since 1.0
      */
-    public LocalDateTime extractExpiredTime(String token) {
-        Date expiration = Jwts.parserBuilder()
+    public Date extractExpiredTime(String token) {
+        return Jwts.parserBuilder()
                 .setSigningKey(getSecretKey(secretKey))
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getExpiration();
-        return convertLocalDateTime(expiration);
     }
 
     /**
@@ -200,9 +197,5 @@ public class JwtTokenProvider {
                 "",
                 userDetails.getAuthorities()
         );
-    }
-
-    private LocalDateTime convertLocalDateTime(Date expiration) {
-        return LocalDateTime.ofInstant(expiration.toInstant(), ZoneId.of("Asia/Seoul"));
     }
 }
