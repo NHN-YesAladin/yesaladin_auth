@@ -113,7 +113,8 @@ public class AuthenticationController {
 
         long expiredTime = tokenProvider.extractExpiredTime(refreshToken).getTime();
 
-        return (expiredTime - (new Date().getTime() / 1000)) > 0;
+        long now = new Date().getTime();
+        return (expiredTime - (now / 1000)) > 0;
     }
 
     /**
