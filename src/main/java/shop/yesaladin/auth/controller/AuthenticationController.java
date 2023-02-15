@@ -4,10 +4,8 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static shop.yesaladin.auth.util.AuthUtil.REFRESH_TOKEN;
 
 import java.io.IOException;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
@@ -97,7 +95,7 @@ public class AuthenticationController {
 
         authenticationService.doReissue(memberUuid, reissuedToken);
 
-        LocalDateTime expiredTime = tokenProvider.extractExpiredTime(reissuedToken);
+        long expiredTime = tokenProvider.extractExpiredTime(reissuedToken).getTime();
 
         response.addHeader(AUTHORIZATION, reissuedToken);
         response.addHeader(UUID_HEADER, memberUuid);
@@ -113,10 +111,10 @@ public class AuthenticationController {
                         .get(memberUuid, REFRESH_TOKEN.getValue()))
                         .toString();
 
-        LocalDateTime expiredTime = tokenProvider.extractExpiredTime(refreshToken);
+        long expiredTime = tokenProvider.extractExpiredTime(refreshToken).getTime();
 
-        return Duration.between(LocalDateTime.now(ZoneId.of("Asia/Seoul")), expiredTime)
-                .toMillis() > 0;
+        long now = new Date().getTime();
+        return (expiredTime - (now / 1000)) > 0;
     }
 
     /**

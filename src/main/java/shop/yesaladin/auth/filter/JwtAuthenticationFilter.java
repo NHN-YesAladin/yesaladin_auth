@@ -7,7 +7,6 @@ import static shop.yesaladin.auth.util.AuthUtil.USER_ID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.servlet.FilterChain;
@@ -114,7 +113,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String accessToken = getAccessToken(auth);
         String refreshToken = getRefreshToken(auth);
 
-        LocalDateTime expiredTime = jwtTokenProvider.extractExpiredTime(accessToken);
+        long expiredTime = jwtTokenProvider.extractExpiredTime(accessToken).getTime();
         log.info("expiredTime={}", expiredTime);
         String memberUuid = UUID.randomUUID().toString();
 
