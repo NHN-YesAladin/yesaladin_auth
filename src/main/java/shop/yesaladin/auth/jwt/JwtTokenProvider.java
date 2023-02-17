@@ -137,7 +137,7 @@ public class JwtTokenProvider {
                     .setSigningKey(getSecretKey(secretKey))
                     .build()
                     .parseClaimsJws(token);
-            log.debug("token : {}", claimsJws);
+            log.info("token : {}", claimsJws);
         } catch (Exception e) {
             return false;
         }
@@ -176,7 +176,7 @@ public class JwtTokenProvider {
 
         String accessToken = createAccessToken(loginId, roles);
 
-        log.info("accessToken={}", accessToken);
+        log.info("Auth Server === Token Reissued, accessToken={}", accessToken);
 
         return accessToken;
     }
