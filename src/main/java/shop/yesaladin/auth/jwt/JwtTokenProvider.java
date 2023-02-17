@@ -30,9 +30,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class JwtTokenProvider {
 
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = Duration.ofMinutes(30)
-            .toMillis(); // 30 minutes
-    private static final long REFRESH_TOKEN_EXPIRE_TIME = Duration.ofDays(7).toMillis(); // 7 days
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = Duration.ofHours(1).toMillis();
+    private static final long REFRESH_TOKEN_EXPIRE_TIME = Duration.ofDays(7).toMillis();
 
     private final UserDetailsService userDetailsService;
 
