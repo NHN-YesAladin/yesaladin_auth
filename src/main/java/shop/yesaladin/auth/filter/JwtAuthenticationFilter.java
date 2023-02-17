@@ -66,8 +66,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         LoginRequestDto loginRequestDto;
         try {
             loginRequestDto = mapper.readValue(request.getInputStream(), LoginRequestDto.class);
+            log.info("Auth Server === Attempt Authentication");
             log.info("loginId={}", loginRequestDto.getLoginId());
-            log.info("password={}", loginRequestDto.getPassword());
         } catch (IOException e) {
             throw new InvalidLoginRequestException();
         }
@@ -108,8 +108,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             FilterChain chain,
             Authentication auth
     ) throws IOException, ServletException {
-        log.info("auth={}", auth);
-        log.info("Granted Authorities={}", auth.getAuthorities());
+        log.info("Auth Server === Authentication Success");
         String accessToken = getAccessToken(auth);
         String refreshToken = getRefreshToken(auth);
 
@@ -121,9 +120,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         redisTemplate.opsForHash().put(memberUuid, ACCESS_TOKEN.getValue(), accessToken);
         redisTemplate.opsForHash().put(memberUuid, USER_ID.getValue(), auth.getName());
         redisTemplate.opsForHash().put(memberUuid, PRINCIPALS.getValue(), auth.getAuthorities().toString());
-
-        log.info("accessToken={}", accessToken);
-        log.info("refreshToken={}", refreshToken);
 
         response.addHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + accessToken);
         response.addHeader(UUID_HEADER, memberUuid);

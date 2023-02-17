@@ -60,8 +60,7 @@ public class AuthenticationController {
         String accessToken = request.getHeader(AUTHORIZATION);
         String memberUuid = request.getHeader("UUID");
 
-        log.info("uuid={}", memberUuid);
-        log.info("accessToken={}", accessToken);
+        log.info("Auth Server === Token Reissue Called");
 
         if (isValidHeader(accessToken, memberUuid)) {
             throw new InvalidAuthorizationHeaderException();
@@ -155,8 +154,7 @@ public class AuthenticationController {
             @RequestHeader(name = "Authorization") String accessToken
     ) {
         String uuid = request.getKey();
-        log.info("uuid={}", uuid);
-        log.info("accessToken={}", accessToken);
+        log.info("Auth Server === Logout called");
 
         if (isValidHeader(accessToken, uuid)) {
             throw new InvalidAuthorizationHeaderException();

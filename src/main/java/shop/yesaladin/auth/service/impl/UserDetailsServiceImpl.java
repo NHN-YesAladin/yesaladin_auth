@@ -58,7 +58,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         MemberResponseDto member = response.getBody().getData();
 
-        log.info("UserDetailsServiceImpl, member={}", member);
+        log.info("UserDetailsServiceImpl, member={}", member.getLoginId());
 
         if (Objects.isNull(member)) {
             throw new UsernameNotFoundException(loginId);
