@@ -1,7 +1,7 @@
 # yesaladin_auth
 
-YesAladin Auth는 MSA 환경으로 구축된 YesAladin 서비스의 인증/인가 처리를 담당하는 시스템 입니다. Spring Security에 JWT 인증 방식을 적용하여 Client의 Login/Logout 요청을 수행
-하며 JWT 토큰을 제공 및 관리합니다.
+YesAladin Auth는 MSA 환경으로 구축된 YesAladin 서비스의 인증/인가 처리를 담당하는 시스템 입니다. Spring Security에 JWT 인증 방식을 적용하여 Client의 Login/Logout 요청을 수행하며
+JWT 토큰을 제공 및 관리합니다.
 
 ## Getting Started
 
