@@ -27,6 +27,10 @@ JWT 토큰을 제공 및 관리합니다.
 
 <img width="1055" alt="스크린샷 2023-02-22 오전 10 15 46" src="https://user-images.githubusercontent.com/60968342/220495916-41d23e85-f467-4e1c-ae44-a1f3b6d58d2a.png">
 
+## CI/CD
+
+<img width="1102" alt="스크린샷 2023-02-22 오후 7 24 08" src="https://user-images.githubusercontent.com/60968342/220593590-58f50bd3-302f-455d-bf99-78371b2a1ba7.png">
+
 ## Technical Issue
 
 ### MSA 환경에서의 인증/인가
