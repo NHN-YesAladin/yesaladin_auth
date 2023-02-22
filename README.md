@@ -25,8 +25,7 @@ JWT 토큰을 제공 및 관리합니다.
 
 ## Project Architecture
 
-// 이미지 추가할 것
-![]()
+<img width="1055" alt="스크린샷 2023-02-22 오전 10 15 46" src="https://user-images.githubusercontent.com/60968342/220495916-41d23e85-f467-4e1c-ae44-a1f3b6d58d2a.png">
 
 ## Technical Issue
 
